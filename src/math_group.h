@@ -20,17 +20,17 @@
 #include <gcrypt.h>
 
 enum groups {
-	MODP  /* F_p, Z modulo a prime */
+	MODP /* F_p, Z modulo a prime */
 };
 
-#define OAKLEY_GRP_1    1
-#define OAKLEY_GRP_2    2
-#define OAKLEY_GRP_5    3
-#define OAKLEY_GRP_14   4
-#define OAKLEY_GRP_15   5
-#define OAKLEY_GRP_16   6
-#define OAKLEY_GRP_17   7
-#define OAKLEY_GRP_18   8
+#define OAKLEY_GRP_1 1
+#define OAKLEY_GRP_2 2
+#define OAKLEY_GRP_5 3
+#define OAKLEY_GRP_14 4
+#define OAKLEY_GRP_15 5
+#define OAKLEY_GRP_16 6
+#define OAKLEY_GRP_17 7
+#define OAKLEY_GRP_18 8
 
 /*
  * The group on which diffie hellmann calculations are done.
@@ -59,11 +59,11 @@ struct group {
 	const struct modp_dscr *group_dscr;
 	void *a, *b, *c, *d;
 	void *gen; /* Group Generator */
-	int (*getlen) (struct group *);
-	void (*getraw) (struct group *, void *, unsigned char *);
-	int (*setraw) (struct group *, void *, unsigned char *, int);
-	int (*setrandom) (struct group *, void *);
-	int (*operation) (struct group *, void *, void *, void *);
+	int (*getlen)(struct group *);
+	void (*getraw)(struct group *, void *, unsigned char *);
+	int (*setraw)(struct group *, void *, unsigned char *, int);
+	int (*setrandom)(struct group *, void *);
+	int (*operation)(struct group *, void *, void *, void *);
 };
 
 /* Prototypes */

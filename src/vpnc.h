@@ -18,7 +18,12 @@ void dpd_ike(struct sa_block *s);
 void print_vid(const unsigned char *vid, uint16_t len);
 void rekey_phase1(struct sa_block *s);
 
-#define ASPRINTF(strp, ...)	if (asprintf(strp, __VA_ARGS__) < 0) \
-	{ if (**strp) { free(*strp);} logmsg(LOG_ERR, "Failed to call asprintf() at %s:%d", __FILE__, __LINE__);}
+#define ASPRINTF(strp, ...)                                                                \
+	if (asprintf(strp, __VA_ARGS__) < 0) {                                             \
+		if (**strp) {                                                              \
+			free(*strp);                                                       \
+		}                                                                          \
+		logmsg(LOG_ERR, "Failed to call asprintf() at %s:%d", __FILE__, __LINE__); \
+	}
 
 #endif /* VPNC_VPNC_H */

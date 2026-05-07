@@ -42,16 +42,18 @@ enum vendor_enum opt_vendor;
 enum if_mode_enum opt_if_mode;
 uint16_t opt_udpencapport;
 
-static unsigned long get_microseconds() {
+static unsigned long get_microseconds()
+{
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	return (unsigned long) 1000000 * tv.tv_sec + tv.tv_usec;
+	return (unsigned long)1000000 * tv.tv_sec + tv.tv_usec;
 }
 
-static void rand_str(char *dest, size_t length) {
+static void rand_str(char *dest, size_t length)
+{
 	srand(get_microseconds());
 	while (length-- > 0) {
-		size_t index = (double) rand() / RAND_MAX * (sizeof charset - 1);
+		size_t index = (double)rand() / RAND_MAX * (sizeof charset - 1);
 		*dest++ = charset[index];
 	}
 	*dest = '\0';
@@ -74,7 +76,6 @@ extern void logmsg(int priority, const char *format, ...)
 	}
 	va_end(ap);
 }
-
 
 void hex_dump(const char *str, const void *data, ssize_t len, const struct debug_strings *decode)
 {
@@ -158,7 +159,7 @@ static ssize_t vpnc_getline(char **lineptr, size_t *n, FILE *stream)
 			goto eof_or_ceot;
 		if (c == '\n' || c == '\r')
 			break;
-		buf[llen++] = (char) c;
+		buf[llen++] = (char)c;
 	}
 
 	buf[llen] = 0;
@@ -210,7 +211,7 @@ static char *vpnc_getpass_program(const char *prompt)
 	fds[1] = -1;
 
 	while ((r = waitpid(pid, &status, 0)) == 0 ||
-		   (r == -1 && errno == EINTR))
+	       (r == -1 && errno == EINTR))
 		;
 
 	if (r == -1)
@@ -302,7 +303,7 @@ static void config_deobfuscate(int obfuscated, int clear)
 		error(1, 0, "error: deobfuscating of password failed (input not a hex string)");
 	}
 
-	ret = deobfuscate(bin, len, config+clear, NULL);
+	ret = deobfuscate(bin, len, config + clear, NULL);
 	free(bin);
 	if (ret != 0) {
 		error(1, 0, "error: deobfuscating of password failed");
@@ -401,285 +402,248 @@ static const struct config_names_s {
 	const char *name;
 	const char *type;
 	const char *desc;
-	const char *(*get_def) (void);
+	const char *(*get_def)(void);
 } config_names[] = {
-	/* Note: broken config file parser does only support option
+    /* Note: broken config file parser does only support option
 	 * names where one is a prefix of another option IF the longer
 	 * option name comes first in this list. */
-	{
-		CONFIG_IPSEC_GATEWAY, 1, 0, 0,
-		"--gateway",
-		"IPSec gateway",
-		"<ip/hostname>",
-		"IP/name of your IPSec gateway",
-		NULL
-	}, {
-		CONFIG_IPSEC_ID, 1, 0, 0,
-		"--id",
-		"IPSec ID",
-		"<ASCII string>",
-		"your group name",
-		NULL
-	}, {
-		CONFIG_IPSEC_SECRET, 1, 1, 0,
-		"--secret",
-		"IPSec secret",
-		"<ASCII string>",
-		"your group password (cleartext)",
-		NULL
-	}, {
-		CONFIG_IPSEC_SECRET_OBF, 1, 0, 1,
-		NULL,
-		"IPSec obfuscated secret",
-		"<hex string>",
-		"your group password (obfuscated)",
-		NULL
-	}, {
-		CONFIG_XAUTH_USERNAME, 1, 0, 0,
-		"--username",
-		"Xauth username",
-		"<ASCII string>",
-		"your username",
-		NULL
-	}, {
-		CONFIG_XAUTH_PASSWORD, 1, 1, 0,
-		"--password",
-		"Xauth password",
-		"<ASCII string>",
-		"your password (cleartext)",
-		NULL
-	}, {
-		CONFIG_XAUTH_PASSWORD_OBF, 1, 0, 1,
-		NULL,
-		"Xauth obfuscated password",
-		"<hex string>",
-		"your password (obfuscated)",
-		NULL
-	}, {
-		CONFIG_DOMAIN, 1, 0, 1,
-		"--domain",
-		"Domain",
-		"<ASCII string>",
-		"(NT-) Domain name for authentication",
-		NULL
-	}, {
-		CONFIG_XAUTH_INTERACTIVE, 0, 0, 1,
-		"--xauth-inter",
-		"Xauth interactive",
-		NULL,
-		"enable interactive extended authentication (for challenge response auth)",
-		NULL
-	}, {
-		CONFIG_VENDOR, 1, 0, 1,
-		"--vendor",
-		"Vendor",
-		"<cisco/netscreen/fortigate>",
-		"vendor of your IPSec gateway",
-		config_def_vendor
-	}, {
-		CONFIG_NATT_MODE, 1, 0, 1,
-		"--natt-mode",
-		"NAT Traversal Mode",
-		"<natt/none/force-natt/cisco-udp>",
-		"Which NAT-Traversal Method to use:\n"
-		" * natt -- NAT-T as defined in RFC3947\n"
-		" * none -- disable use of any NAT-T method\n"
-		" * force-natt -- always use NAT-T encapsulation even\n"
-		"                 without presence of a NAT device\n"
-		"                 (useful if the OS captures all ESP traffic)\n"
-		" * cisco-udp -- Cisco proprietary UDP encapsulation, commonly over Port 10000\n"
-		"Note: cisco-tcp encapsulation is not yet supported\n",
-		config_def_natt_mode
-	}, {
-		CONFIG_SCRIPT, 1, 0, 1,
-		"--script",
-		"Script",
-		"<command>",
-		"command is executed using system() to configure the interface,\n"
-		"routing and so on. Device name, IP, etc. are passed using environment\n"
-		"variables, see README. This script is executed right after ISAKMP is\n"
-		"done, but before tunneling is enabled. It is called when vpnc\n"
-		"terminates, too\n",
-		config_def_script
-	}, {
-		CONFIG_IKE_DH, 1, 0, 1,
-		"--dh",
-		"IKE DH Group",
-		"<dh1/dh2/dh5/dh14/dh15/dh16/dh17/dh18>",
-		"name of the IKE DH Group",
-		config_def_ike_dh
-	}, {
-		CONFIG_IPSEC_PFS, 1, 0, 1,
-		"--pfs",
-		"Perfect Forward Secrecy",
-		"<nopfs/dh1/dh2/dh5/dh14/dh15/dh16/dh17/dh18/server>",
-		"Diffie-Hellman group to use for PFS",
-		config_def_pfs
-	}, {
-		CONFIG_ENABLE_WEAK_ENCRYPTION, 0, 0, 1,
-		"--enable-1des",
-		"Enable Single DES",
-		NULL,
-		"Deprecated: Please use --enable-weak-encryption instead.",
-		NULL
-	}, {
-		CONFIG_ENABLE_WEAK_ENCRYPTION, 0, 0, 1,
-		"--enable-weak-encryption",
-		"Enable weak encryption",
-		NULL,
-		"enables weak encryption methods (such as DES, 3DES)",
-		NULL
-	}, {
-		CONFIG_ENABLE_NO_ENCRYPTION, 0, 0, 1,
-		"--enable-no-encryption",
-		"Enable no encryption",
-		NULL,
-		"enables using no encryption for data traffic (key exchanged must be encrypted)",
-		NULL
-	}, {
-		CONFIG_ENABLE_WEAK_AUTHENTICATION, 0, 0, 1,
-		"--enable-weak-authentication",
-		"Enable weak authentication",
-		NULL,
-		"enables weak authentication methods (such as MD5)",
-		NULL
-	}, {
-		CONFIG_VERSION, 1, 0, 1,
-		"--application-version",
-		"Application version",
-		"<ASCII string>",
-		"Application Version to report. Note: Default string is generated at runtime.",
-		config_def_app_version
-	}, {
-		CONFIG_IF_NAME, 1, 0, 1,
-		"--ifname",
-		"Interface name",
-		"<ASCII string>",
-		"visible name of the TUN/TAP interface",
-		NULL
-	}, {
-		CONFIG_IF_MODE, 1, 0, 1,
-		"--ifmode",
-		"Interface mode",
-		"<tun/tap>",
-		"mode of TUN/TAP interface:\n"
-		" * tun: virtual point to point interface (default)\n"
-		" * tap: virtual ethernet interface\n",
-		config_def_if_mode
-	}, {
-		CONFIG_IF_MTU, 1, 0, 1,
-		"--ifmtu",
-		"Interface MTU",
-		"<0-65535>",
-		"Set MTU for TUN/TAP interface (default 0 == automatic detect)",
-		NULL
-	}, {
-		CONFIG_DEBUG, 1, 0, 1,
-		"--debug",
-		"Debug",
-		"<0/1/2/3/99>",
-		"Show verbose debug messages\n"
-		" *  0: Do not print debug information.\n"
-		" *  1: Print minimal debug information.\n"
-		" *  2: Show statemachine and packet/payload type information.\n"
-		" *  3: Dump everything excluding authentication data.\n"
-		" * 99: Dump everything INCLUDING AUTHENTICATION data (e.g. PASSWORDS).\n",
-		NULL
-	}, {
-		CONFIG_ND, 0, 0, 1,
-		"--no-detach",
-		"No Detach",
-		NULL,
-		"Don't detach from the console after login",
-		NULL
-	}, {
-		CONFIG_PID_FILE, 1, 0, 1,
-		"--pid-file",
-		"Pidfile",
-		"<filename>",
-		"store the pid of background process in <filename>",
-		config_def_pid_file
-	}, {
-		CONFIG_LOCAL_ADDR, 1, 0, 1,
-		"--local-addr",
-		"Local Addr",
-		"<ip/hostname>",
-		"local IP to use for ISAKMP / ESP / ... (0.0.0.0 == automatically assign)",
-		config_def_local_addr
-	}, {
-		CONFIG_LOCAL_PORT, 1, 0, 1,
-		"--local-port",
-		"Local Port",
-		"<0-65535>",
-		"local ISAKMP port number to use (0 == use random port)",
-		config_def_local_port
-	}, {
-		CONFIG_UDP_ENCAP_PORT, 1, 0, 1,
-		"--udp-port",
-		"Cisco UDP Encapsulation Port",
-		"<0-65535>",
-		"Local UDP port number to use (0 == use random port).\n"
-		"This is only relevant if cisco-udp nat-traversal is used.\n"
-		"This is the _local_ port, the remote udp port is discovered automatically.\n"
-		"It is especially not the cisco-tcp port.\n",
-		config_def_udp_port
-	}, {
-		CONFIG_DPD_IDLE, 1, 0, 1,
-		"--dpd-idle",
-		"DPD idle timeout (our side)",
-		"<0,10-86400>",
-		"Send DPD packet after not receiving anything for <idle> seconds.\n"
-		"Use 0 to disable DPD completely (both ways).\n",
-		config_def_dpd_idle
-	}, {
-		CONFIG_NON_INTERACTIVE, 0, 0, 1,
-		"--non-inter",
-		"Noninteractive",
-		NULL,
-		"Don't ask anything, exit on missing options",
-		NULL
-	}, {
-		CONFIG_AUTH_MODE, 1, 0, 1,
-		"--auth-mode",
-		"IKE Authmode",
-		"<psk/cert/hybrid>",
-		"Authentication mode:\n"
-		" * psk:    pre-shared key (default)\n"
-		" * cert:   server + client certificate (not implemented yet)\n"
-		" * hybrid: server certificate + xauth (if built with openssl support)\n",
-		config_def_auth_mode
-	}, {
-		CONFIG_CA_FILE, 1, 0, 1,
-		"--ca-file",
-		"CA-File",
-		"<filename>",
-		"filename and path to the CA-PEM-File",
-		NULL
-	}, {
-		CONFIG_CA_DIR, 1, 0, 1,
-		"--ca-dir",
-		"CA-Dir",
-		"<directory>",
-		"path of the trusted CA-Directory",
-		config_ca_dir
-	}, {
-		CONFIG_IPSEC_TARGET_NETWORK, 1, 0, 1,
-		"--target-network",
-		"IPSEC target network",
-		"<target network/netmask>",
-		"Target network in dotted decimal or CIDR notation\n",
-		config_def_target_network
-	}, {
-		CONFIG_PASSWORD_HELPER, 1, 0, 1,
-		"--password-helper",
-		"Password helper",
-		"<executable>",
-		"path to password program or helper name\n",
-		NULL
-	}, {
-		0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL
-	}
-};
+    {
+	CONFIG_IPSEC_GATEWAY, 1, 0, 0,
+	"--gateway",
+	"IPSec gateway",
+	"<ip/hostname>",
+	"IP/name of your IPSec gateway",
+	NULL},
+    {CONFIG_IPSEC_ID, 1, 0, 0,
+     "--id",
+     "IPSec ID",
+     "<ASCII string>",
+     "your group name",
+     NULL},
+    {CONFIG_IPSEC_SECRET, 1, 1, 0,
+     "--secret",
+     "IPSec secret",
+     "<ASCII string>",
+     "your group password (cleartext)",
+     NULL},
+    {CONFIG_IPSEC_SECRET_OBF, 1, 0, 1,
+     NULL,
+     "IPSec obfuscated secret",
+     "<hex string>",
+     "your group password (obfuscated)",
+     NULL},
+    {CONFIG_XAUTH_USERNAME, 1, 0, 0,
+     "--username",
+     "Xauth username",
+     "<ASCII string>",
+     "your username",
+     NULL},
+    {CONFIG_XAUTH_PASSWORD, 1, 1, 0,
+     "--password",
+     "Xauth password",
+     "<ASCII string>",
+     "your password (cleartext)",
+     NULL},
+    {CONFIG_XAUTH_PASSWORD_OBF, 1, 0, 1,
+     NULL,
+     "Xauth obfuscated password",
+     "<hex string>",
+     "your password (obfuscated)",
+     NULL},
+    {CONFIG_DOMAIN, 1, 0, 1,
+     "--domain",
+     "Domain",
+     "<ASCII string>",
+     "(NT-) Domain name for authentication",
+     NULL},
+    {CONFIG_XAUTH_INTERACTIVE, 0, 0, 1,
+     "--xauth-inter",
+     "Xauth interactive",
+     NULL,
+     "enable interactive extended authentication (for challenge response auth)",
+     NULL},
+    {CONFIG_VENDOR, 1, 0, 1,
+     "--vendor",
+     "Vendor",
+     "<cisco/netscreen/fortigate>",
+     "vendor of your IPSec gateway",
+     config_def_vendor},
+    {CONFIG_NATT_MODE, 1, 0, 1,
+     "--natt-mode",
+     "NAT Traversal Mode",
+     "<natt/none/force-natt/cisco-udp>",
+     "Which NAT-Traversal Method to use:\n"
+     " * natt -- NAT-T as defined in RFC3947\n"
+     " * none -- disable use of any NAT-T method\n"
+     " * force-natt -- always use NAT-T encapsulation even\n"
+     "                 without presence of a NAT device\n"
+     "                 (useful if the OS captures all ESP traffic)\n"
+     " * cisco-udp -- Cisco proprietary UDP encapsulation, commonly over Port 10000\n"
+     "Note: cisco-tcp encapsulation is not yet supported\n",
+     config_def_natt_mode},
+    {CONFIG_SCRIPT, 1, 0, 1,
+     "--script",
+     "Script",
+     "<command>",
+     "command is executed using system() to configure the interface,\n"
+     "routing and so on. Device name, IP, etc. are passed using environment\n"
+     "variables, see README. This script is executed right after ISAKMP is\n"
+     "done, but before tunneling is enabled. It is called when vpnc\n"
+     "terminates, too\n",
+     config_def_script},
+    {CONFIG_IKE_DH, 1, 0, 1,
+     "--dh",
+     "IKE DH Group",
+     "<dh1/dh2/dh5/dh14/dh15/dh16/dh17/dh18>",
+     "name of the IKE DH Group",
+     config_def_ike_dh},
+    {CONFIG_IPSEC_PFS, 1, 0, 1,
+     "--pfs",
+     "Perfect Forward Secrecy",
+     "<nopfs/dh1/dh2/dh5/dh14/dh15/dh16/dh17/dh18/server>",
+     "Diffie-Hellman group to use for PFS",
+     config_def_pfs},
+    {CONFIG_ENABLE_WEAK_ENCRYPTION, 0, 0, 1,
+     "--enable-1des",
+     "Enable Single DES",
+     NULL,
+     "Deprecated: Please use --enable-weak-encryption instead.",
+     NULL},
+    {CONFIG_ENABLE_WEAK_ENCRYPTION, 0, 0, 1,
+     "--enable-weak-encryption",
+     "Enable weak encryption",
+     NULL,
+     "enables weak encryption methods (such as DES, 3DES)",
+     NULL},
+    {CONFIG_ENABLE_NO_ENCRYPTION, 0, 0, 1,
+     "--enable-no-encryption",
+     "Enable no encryption",
+     NULL,
+     "enables using no encryption for data traffic (key exchanged must be encrypted)",
+     NULL},
+    {CONFIG_ENABLE_WEAK_AUTHENTICATION, 0, 0, 1,
+     "--enable-weak-authentication",
+     "Enable weak authentication",
+     NULL,
+     "enables weak authentication methods (such as MD5)",
+     NULL},
+    {CONFIG_VERSION, 1, 0, 1,
+     "--application-version",
+     "Application version",
+     "<ASCII string>",
+     "Application Version to report. Note: Default string is generated at runtime.",
+     config_def_app_version},
+    {CONFIG_IF_NAME, 1, 0, 1,
+     "--ifname",
+     "Interface name",
+     "<ASCII string>",
+     "visible name of the TUN/TAP interface",
+     NULL},
+    {CONFIG_IF_MODE, 1, 0, 1,
+     "--ifmode",
+     "Interface mode",
+     "<tun/tap>",
+     "mode of TUN/TAP interface:\n"
+     " * tun: virtual point to point interface (default)\n"
+     " * tap: virtual ethernet interface\n",
+     config_def_if_mode},
+    {CONFIG_IF_MTU, 1, 0, 1,
+     "--ifmtu",
+     "Interface MTU",
+     "<0-65535>",
+     "Set MTU for TUN/TAP interface (default 0 == automatic detect)",
+     NULL},
+    {CONFIG_DEBUG, 1, 0, 1,
+     "--debug",
+     "Debug",
+     "<0/1/2/3/99>",
+     "Show verbose debug messages\n"
+     " *  0: Do not print debug information.\n"
+     " *  1: Print minimal debug information.\n"
+     " *  2: Show statemachine and packet/payload type information.\n"
+     " *  3: Dump everything excluding authentication data.\n"
+     " * 99: Dump everything INCLUDING AUTHENTICATION data (e.g. PASSWORDS).\n",
+     NULL},
+    {CONFIG_ND, 0, 0, 1,
+     "--no-detach",
+     "No Detach",
+     NULL,
+     "Don't detach from the console after login",
+     NULL},
+    {CONFIG_PID_FILE, 1, 0, 1,
+     "--pid-file",
+     "Pidfile",
+     "<filename>",
+     "store the pid of background process in <filename>",
+     config_def_pid_file},
+    {CONFIG_LOCAL_ADDR, 1, 0, 1,
+     "--local-addr",
+     "Local Addr",
+     "<ip/hostname>",
+     "local IP to use for ISAKMP / ESP / ... (0.0.0.0 == automatically assign)",
+     config_def_local_addr},
+    {CONFIG_LOCAL_PORT, 1, 0, 1,
+     "--local-port",
+     "Local Port",
+     "<0-65535>",
+     "local ISAKMP port number to use (0 == use random port)",
+     config_def_local_port},
+    {CONFIG_UDP_ENCAP_PORT, 1, 0, 1,
+     "--udp-port",
+     "Cisco UDP Encapsulation Port",
+     "<0-65535>",
+     "Local UDP port number to use (0 == use random port).\n"
+     "This is only relevant if cisco-udp nat-traversal is used.\n"
+     "This is the _local_ port, the remote udp port is discovered automatically.\n"
+     "It is especially not the cisco-tcp port.\n",
+     config_def_udp_port},
+    {CONFIG_DPD_IDLE, 1, 0, 1,
+     "--dpd-idle",
+     "DPD idle timeout (our side)",
+     "<0,10-86400>",
+     "Send DPD packet after not receiving anything for <idle> seconds.\n"
+     "Use 0 to disable DPD completely (both ways).\n",
+     config_def_dpd_idle},
+    {CONFIG_NON_INTERACTIVE, 0, 0, 1,
+     "--non-inter",
+     "Noninteractive",
+     NULL,
+     "Don't ask anything, exit on missing options",
+     NULL},
+    {CONFIG_AUTH_MODE, 1, 0, 1,
+     "--auth-mode",
+     "IKE Authmode",
+     "<psk/cert/hybrid>",
+     "Authentication mode:\n"
+     " * psk:    pre-shared key (default)\n"
+     " * cert:   server + client certificate (not implemented yet)\n"
+     " * hybrid: server certificate + xauth (if built with openssl support)\n",
+     config_def_auth_mode},
+    {CONFIG_CA_FILE, 1, 0, 1,
+     "--ca-file",
+     "CA-File",
+     "<filename>",
+     "filename and path to the CA-PEM-File",
+     NULL},
+    {CONFIG_CA_DIR, 1, 0, 1,
+     "--ca-dir",
+     "CA-Dir",
+     "<directory>",
+     "path of the trusted CA-Directory",
+     config_ca_dir},
+    {CONFIG_IPSEC_TARGET_NETWORK, 1, 0, 1,
+     "--target-network",
+     "IPSEC target network",
+     "<target network/netmask>",
+     "Target network in dotted decimal or CIDR notation\n",
+     config_def_target_network},
+    {CONFIG_PASSWORD_HELPER, 1, 0, 1,
+     "--password-helper",
+     "Password helper",
+     "<executable>",
+     "path to password program or helper name\n",
+     NULL},
+    {0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL}};
 
 static char *get_config_filename(const char *name, int add_dot_conf)
 {
@@ -715,7 +679,7 @@ static void read_config_file(const char *name, const char **configs, int missing
 		if (f == NULL)
 			error(1, errno, "couldn't open `%s'", realname);
 	}
-	for (;; ) {
+	for (;;) {
 		ssize_t llen;
 		int i;
 
@@ -728,7 +692,7 @@ static void read_config_file(const char *name, const char **configs, int missing
 		linenum++;
 		for (i = 0; config_names[i].name != NULL; i++) {
 			if (strncasecmp(config_names[i].name, line,
-							strlen(config_names[i].name)) == 0) {
+					strlen(config_names[i].name)) == 0) {
 				/* boolean implementation, using harmless pointer targets as true */
 				if (!config_names[i].needsArgument) {
 					configs[config_names[i].nm] = config_names[i].name;
@@ -764,7 +728,7 @@ static void read_config_file(const char *name, const char **configs, int missing
 		}
 		if (config_names[i].name == NULL && line[0] != '#' && line[0] != 0)
 			error(0, 0, "warning: unknown configuration directive in %s at line %d",
-				  realname, linenum);
+			      realname, linenum);
 	}
 	free(line);
 	free(realname);
@@ -776,8 +740,8 @@ static void print_desc(const char *pre, const char *text)
 {
 	const char *p, *q;
 
-	for (p = text, q = strchr(p, '\n'); q; p = q+1, q = strchr(p, '\n'))
-		printf("%s%.*s\n", pre, (int)(q-p), p);
+	for (p = text, q = strchr(p, '\n'); q; p = q + 1, q = strchr(p, '\n'))
+		printf("%s%.*s\n", pre, (int)(q - p), p);
 
 	if (*p != '\0')
 		printf("%s%s\n", pre, p);
@@ -788,16 +752,14 @@ static void print_usage(char *argv0, int print_level)
 	int c;
 
 	printf("Usage: %s [--version] [--print-config] [--help] [--long-help] [options] [config files]\n\n",
-		   argv0);
+	       argv0);
 	printf("Options:\n");
 	for (c = 0; config_names[c].name != NULL; c++) {
 		if (config_names[c].long_only > print_level)
 			continue;
 
-		printf("  %s %s\n", (config_names[c].option == NULL ?
-							 "(configfile only option)" : config_names[c].option),
-			   ((config_names[c].type == NULL || config_names[c].option == NULL) ?
-				"" : config_names[c].type));
+		printf("  %s %s\n", (config_names[c].option == NULL ? "(configfile only option)" : config_names[c].option),
+		       ((config_names[c].type == NULL || config_names[c].option == NULL) ? "" : config_names[c].type));
 
 		print_desc("      ", config_names[c].desc);
 
@@ -805,7 +767,7 @@ static void print_usage(char *argv0, int print_level)
 			printf("    Default: %s\n", config_names[c].get_def());
 
 		printf("  conf-variable: %s%s\n", config_names[c].name,
-			   (config_names[c].type == NULL ? "" : config_names[c].type));
+		       (config_names[c].type == NULL ? "" : config_names[c].type));
 
 		printf("\n");
 	}
@@ -823,12 +785,12 @@ static void print_version(void)
 	printf("vpnc version " VERSION "\n");
 	printf("Copyright (C) 2002-2006 Geoffrey Keating, Maurice Massar, others\n");
 	printf("vpnc comes with NO WARRANTY, to the extent permitted by law.\n"
-		   "You may redistribute copies of vpnc under the terms of the GNU General\n"
-		   "Public License.  For more information about these matters, see the files\n"
-		   "named COPYING.\n");
+	       "You may redistribute copies of vpnc under the terms of the GNU General\n"
+	       "Public License.  For more information about these matters, see the files\n"
+	       "named COPYING.\n");
 #ifdef OPENSSL_GPL_VIOLATION
 	printf("Built with openssl certificate support. Be aware of the\n"
-		   "license implications.\n");
+	       "license implications.\n");
 #else /* OPENSSL_GPL_VIOLATION */
 	printf("Built with certificate support.\n");
 #endif /* OPENSSL_GPL_VIOLATION */
@@ -872,9 +834,8 @@ void do_config(int argc, char **argv)
 		known = 0;
 
 		for (c = 0; config_names[c].name != NULL && !known; c++) {
-			if (config_names[c].option == NULL
-				|| strncmp(argv[i], config_names[c].option,
-						   strlen(config_names[c].option)) != 0)
+			if (config_names[c].option == NULL || strncmp(argv[i], config_names[c].option,
+								      strlen(config_names[c].option)) != 0)
 				continue;
 
 			s = NULL;
@@ -936,8 +897,7 @@ void do_config(int argc, char **argv)
 
 	if (!print_config) {
 		for (i = 0; config_names[i].name != NULL; i++)
-			if (!config[config_names[i].nm]
-				&& config_names[i].get_def != NULL)
+			if (!config[config_names[i].nm] && config_names[i].get_def != NULL)
 				config[config_names[i].nm] = config_names[i].get_def();
 
 		opt_debug = (config[CONFIG_DEBUG]) ? atoi(config[CONFIG_DEBUG]) : 0;
@@ -956,7 +916,7 @@ void do_config(int argc, char **argv)
 			exit(1);
 		}
 		opt_no_encryption = (config[CONFIG_ENABLE_NO_ENCRYPTION]) ? 1 : 0;
-		opt_udpencapport=atoi(config[CONFIG_UDP_ENCAP_PORT]);
+		opt_udpencapport = atoi(config[CONFIG_UDP_ENCAP_PORT]);
 
 		if (!strcmp(config[CONFIG_NATT_MODE], "natt")) {
 			opt_natt_mode = NATT_NORMAL;
@@ -995,7 +955,7 @@ void do_config(int argc, char **argv)
 	if (opt_debug >= 99) {
 		printf("WARNING! active debug level is >= 99, output includes username and password (hex encoded)\n");
 		fprintf(stderr,
-				"WARNING! active debug level is >= 99, output includes username and password (hex encoded)\n");
+			"WARNING! active debug level is >= 99, output includes username and password (hex encoded)\n");
 	}
 
 	config_deobfuscate(CONFIG_IPSEC_SECRET_OBF, CONFIG_IPSEC_SECRET);
@@ -1019,15 +979,15 @@ void do_config(int argc, char **argv)
 			break;
 		case CONFIG_IPSEC_SECRET:
 			ASPRINTF(&prompt, "Enter IPSec secret for %s@%s: ",
-					 config[CONFIG_IPSEC_ID], config[CONFIG_IPSEC_GATEWAY]);
+				 config[CONFIG_IPSEC_ID], config[CONFIG_IPSEC_GATEWAY]);
 			break;
 		case CONFIG_XAUTH_USERNAME:
 			printf("Enter username for %s: ", config[CONFIG_IPSEC_GATEWAY]);
 			break;
 		case CONFIG_XAUTH_PASSWORD:
 			ASPRINTF(&prompt, "Enter password for %s@%s: ",
-					 config[CONFIG_XAUTH_USERNAME],
-					 config[CONFIG_IPSEC_GATEWAY]);
+				 config[CONFIG_XAUTH_USERNAME],
+				 config[CONFIG_IPSEC_GATEWAY]);
 			break;
 		default:
 			continue;
@@ -1058,10 +1018,7 @@ void do_config(int argc, char **argv)
 			if (config_names[i].needsArgument) {
 				ssize_t last;
 				last = strlen(config[config_names[i].nm]) - 1;
-				if (     config[config_names[i].nm][0] == ' '  || config[config_names[i].nm][last] == ' '
-						 ||   config[config_names[i].nm][0] == '\t' || config[config_names[i].nm][last] == '\t'
-						 || ( config[config_names[i].nm][0] == '"'  && config[config_names[i].nm][last] == '"'  )
-						 ) {
+				if (config[config_names[i].nm][0] == ' ' || config[config_names[i].nm][last] == ' ' || config[config_names[i].nm][0] == '\t' || config[config_names[i].nm][last] == '\t' || (config[config_names[i].nm][0] == '"' && config[config_names[i].nm][last] == '"')) {
 					printf(" %s%s%s", "\"", config[config_names[i].nm], "\"");
 				} else {
 					printf(" %s", config[config_names[i].nm]);
@@ -1086,7 +1043,7 @@ void do_config(int argc, char **argv)
 		error(1, 0, "IKE DH Group \"%s\" unsupported\n", config[CONFIG_IKE_DH]);
 	if (get_dh_group_ipsec(-1) == NULL)
 		error(1, 0, "Perfect Forward Secrecy \"%s\" unsupported\n",
-			  config[CONFIG_IPSEC_PFS]);
+		      config[CONFIG_IPSEC_PFS]);
 	if (get_dh_group_ike()->ike_sa_id == 0)
 		error(1, 0, "IKE DH Group must not be nopfs\n");
 

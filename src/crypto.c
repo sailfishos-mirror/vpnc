@@ -19,12 +19,11 @@
 #include "sysdep.h"
 #include "crypto.h"
 
-
 #define MSG_SIZE 200
 void crypto_error_set(crypto_error **error,
-					  int code,
-					  int in_errno,
-					  const char *fmt, ...)
+		      int code,
+		      int in_errno,
+		      const char *fmt, ...)
 {
 	va_list args;
 
@@ -131,4 +130,3 @@ out:
 	close(fd);
 	return data;
 }
-

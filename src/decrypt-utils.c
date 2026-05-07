@@ -20,14 +20,13 @@
 
 #include "decrypt-utils.h"
 
-
 static int hex2bin_c(unsigned int c)
 {
-	if ((c >= '0')&&(c <= '9'))
+	if ((c >= '0') && (c <= '9'))
 		return c - '0';
-	if ((c >= 'A')&&(c <= 'F'))
+	if ((c >= 'A') && (c <= 'F'))
 		return c - 'A' + 10;
-	if ((c >= 'a')&&(c <= 'f'))
+	if ((c >= 'a') && (c <= 'f'))
 		return c - 'a' + 10;
 	return -1;
 }
@@ -54,7 +53,7 @@ int hex2bin(const char *str, char **bin, int *len)
 		return ENOMEM;
 
 	for (i = 0; i < l; i++)
-		p[i] = hex2bin_c(str[i*2]) << 4 | hex2bin_c(str[i*2+1]);
+		p[i] = hex2bin_c(str[i * 2]) << 4 | hex2bin_c(str[i * 2 + 1]);
 
 	*bin = p;
 	if (len)
@@ -65,8 +64,8 @@ int hex2bin(const char *str, char **bin, int *len)
 
 int deobfuscate(char *ct, int len, const char **resp, char *reslenp)
 {
-	const char *h1  = ct;
-	const char *h4  = ct + 20;
+	const char *h1 = ct;
+	const char *h4 = ct + 20;
 	const char *enc = ct + 40;
 
 	char ht[20], h2[20], h3[20], key[24];
@@ -88,7 +87,7 @@ int deobfuscate(char *ct, int len, const char **resp, char *reslenp)
 	gcry_md_hash_buffer(GCRY_MD_SHA1, h3, ht, 20);
 
 	memcpy(key, h2, 20);
-	memcpy(key+20, h3, 4);
+	memcpy(key + 20, h3, 4);
 	/* who cares about parity anyway? */
 
 	gcry_md_hash_buffer(GCRY_MD_SHA1, ht, enc, len);
@@ -106,7 +105,7 @@ int deobfuscate(char *ct, int len, const char **resp, char *reslenp)
 	gcry_cipher_decrypt(ctx, (unsigned char *)res, len, (unsigned char *)enc, len);
 	gcry_cipher_close(ctx);
 
-	reslen = len - res[len-1];
+	reslen = len - res[len - 1];
 	res[reslen] = '\0';
 
 	if (resp)

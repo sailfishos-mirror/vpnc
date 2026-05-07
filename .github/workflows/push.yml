@@ -1,3 +1,4 @@
+---
 name: push
 
 on: # yamllint disable-line rule:truthy
@@ -18,7 +19,7 @@ permissions:
   pull-requests: read
   repository-projects: none
   security-events: none
-  statuses: write
+  statuses: none
 
 jobs:
   super-linter:
@@ -27,7 +28,7 @@ jobs:
       contents: read
       statuses: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -37,12 +38,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: ${{ !contains(github.event_name, 'pull_request') }}
           VALIDATE_JSCPD: false
+          # cpplint conflicts with project's tab-indent C style; clang-format is canonical
+          VALIDATE_CPP: false
+          # pcf2vpnc is vendored upstream perl
+          FILTER_REGEX_EXCLUDE: .*src/pcf2vpnc$
   test:
     needs: [super-linter]
     if: success()
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - run: |
           sudo apt update
           sudo apt install -y libgcrypt20-dev libgnutls28-dev
@@ -52,14 +59,16 @@ jobs:
     if: success() && github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v4.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d
         id: filter
         with:
           filters: |
             docs:
               - 'docs/**'
-      - uses: peter-evans/repository-dispatch@v4
+      - uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697
         if: steps.filter.outputs.docs == 'true'
         with:
           token: ${{ secrets.REPOSITORY_DISPATCH_STREAMBINDER }}

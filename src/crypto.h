@@ -33,7 +33,7 @@ unsigned char *crypto_read_file(const char *path, size_t *out_len, crypto_error 
 #error "no crypto library defined"
 #endif
 
-#define CRYPTO_PAD_NONE  0
+#define CRYPTO_PAD_NONE 0
 #define CRYPTO_PAD_PKCS1 1
 
 /**
@@ -65,8 +65,8 @@ void crypto_ctx_free(crypto_ctx *ctx);
  * Returns: certificate data on success, NULL on error
  **/
 unsigned char *crypto_read_cert(const char *path,
-								size_t *out_len,
-								crypto_error **error);
+				size_t *out_len,
+				crypto_error **error);
 
 /**
  * crypto_push_cert:
@@ -80,9 +80,9 @@ unsigned char *crypto_read_cert(const char *path,
  * Returns: 0 on success, 1 on error
  **/
 int crypto_push_cert(crypto_ctx *ctx,
-					 const unsigned char *data,
-					 size_t len,
-					 crypto_error **error);
+		     const unsigned char *data,
+		     size_t len,
+		     crypto_error **error);
 
 /**
  * crypto_verify_chain:
@@ -100,9 +100,9 @@ int crypto_push_cert(crypto_ctx *ctx,
  * Returns: 0 on success, 1 on error
  **/
 int crypto_verify_chain(crypto_ctx *ctx,
-						const char *ca_file,
-						const char *ca_dir,
-						crypto_error **error);
+			const char *ca_file,
+			const char *ca_dir,
+			crypto_error **error);
 
 /**
  * crypto_decrypt_signature:
@@ -118,11 +118,10 @@ int crypto_verify_chain(crypto_ctx *ctx,
  * Returns: decrypted message digest, or #NULL on error
  **/
 unsigned char *crypto_decrypt_signature(crypto_ctx *ctx,
-										const unsigned char *sig_data,
-										size_t sig_len,
-										size_t *out_hash_len,
-										unsigned int padding,
-										crypto_error **error);
+					const unsigned char *sig_data,
+					size_t sig_len,
+					size_t *out_hash_len,
+					unsigned int padding,
+					crypto_error **error);
 
-#endif  /* VPNC_CRYPTO_H */
-
+#endif /* VPNC_CRYPTO_H */

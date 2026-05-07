@@ -17,5 +17,4 @@ typedef struct {
 	gnutls_x509_crt_t *stack;
 } crypto_ctx;
 
-#endif  /* VPNC_CRYPTO_GNUTLS_H */
-
+#endif /* VPNC_CRYPTO_GNUTLS_H */

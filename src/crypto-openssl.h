@@ -17,8 +17,7 @@
 #include <openssl/err.h>
 
 typedef struct {
-	STACK_OF(X509) *stack;
+	STACK_OF(X509) * stack;
 } crypto_ctx;
 
-#endif  /* __CRYPTO_OPENSSL_H__ */
-
+#endif /* __CRYPTO_OPENSSL_H__ */

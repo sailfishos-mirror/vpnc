@@ -118,17 +118,17 @@ extern void *xallocc(size_t x);
 extern struct isakmp_packet *new_isakmp_packet(void);
 extern struct isakmp_payload *new_isakmp_payload(uint8_t);
 extern struct isakmp_payload *new_isakmp_data_payload(uint8_t type, const void *data,
-													  size_t data_length);
+						      size_t data_length);
 extern struct isakmp_attribute *new_isakmp_attribute(uint16_t, struct isakmp_attribute *);
 extern struct isakmp_attribute *new_isakmp_attribute_16(uint16_t type, uint16_t data,
-														struct isakmp_attribute *next);
+							struct isakmp_attribute *next);
 extern void free_isakmp_packet(struct isakmp_packet *p);
-extern void flatten_isakmp_payloads(struct isakmp_payload *p, uint8_t ** result, size_t * size);
-extern void flatten_isakmp_payload(struct isakmp_payload *p, uint8_t ** result, size_t * size);
+extern void flatten_isakmp_payloads(struct isakmp_payload *p, uint8_t **result, size_t *size);
+extern void flatten_isakmp_payload(struct isakmp_payload *p, uint8_t **result, size_t *size);
 extern void flatten_isakmp_packet(struct isakmp_packet *p,
-								  uint8_t ** result, size_t * size, size_t blksz);
-extern struct isakmp_packet *parse_isakmp_packet(const uint8_t * data,
-												 size_t data_len, int * reject);
+				  uint8_t **result, size_t *size, size_t blksz);
+extern struct isakmp_packet *parse_isakmp_packet(const uint8_t *data,
+						 size_t data_len, int *reject);
 extern void test_pack_unpack(void);
 
 #endif /* VPNC_ISAKMP_PKT_H */

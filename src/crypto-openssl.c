@@ -22,7 +22,7 @@ crypto_ctx *crypto_ctx_new(crypto_error **error)
 	ctx = malloc(sizeof(crypto_ctx));
 	if (!ctx) {
 		crypto_error_set(error, 1, ENOMEM,
-						 "not enough memory for crypto context");
+				 "not enough memory for crypto context");
 		return NULL;
 	}
 
@@ -36,7 +36,7 @@ crypto_ctx *crypto_ctx_new(crypto_error **error)
 	if (!ctx->stack) {
 		crypto_ctx_free(ctx);
 		crypto_error_set(error, 1, ENOMEM,
-						 "not enough memory for crypto certificate stack");
+				 "not enough memory for crypto certificate stack");
 		ctx = NULL;
 	}
 
@@ -62,8 +62,8 @@ static int password_cb(char *buf __attribute__((unused)), int size __attribute__
 }
 
 unsigned char *crypto_read_cert(const char *path,
-								size_t *out_len,
-								crypto_error **error)
+				size_t *out_len,
+				crypto_error **error)
 {
 	FILE *fp;
 	X509 *cert = NULL;
@@ -76,7 +76,7 @@ unsigned char *crypto_read_cert(const char *path,
 	}
 
 	cert = PEM_read_X509(fp, NULL, password_cb, NULL);
-	fclose (fp);
+	fclose(fp);
 
 	if (!cert) {
 		/* Try DER then */
@@ -86,7 +86,7 @@ unsigned char *crypto_read_cert(const char *path,
 			return NULL;
 		}
 
-		cert = d2i_X509(NULL, (const unsigned char **) &p, (int) (*out_len));
+		cert = d2i_X509(NULL, (const unsigned char **)&p, (int)(*out_len));
 		if (!cert) {
 			free(data);
 			crypto_error_set(error, 1, 0, "could not allocate memory for certificate");
@@ -127,9 +127,9 @@ out:
 }
 
 int crypto_push_cert(crypto_ctx *ctx,
-					 const unsigned char *data,
-					 size_t len,
-					 crypto_error **error)
+		     const unsigned char *data,
+		     size_t len,
+		     crypto_error **error)
 {
 	X509 *cert = NULL;
 
@@ -139,7 +139,7 @@ int crypto_push_cert(crypto_ctx *ctx,
 	}
 
 	/* convert the certificate to an openssl-X509 structure and push it onto the chain stack */
-	cert = d2i_X509(NULL, &data, (int) len);
+	cert = d2i_X509(NULL, &data, (int)len);
 	if (!cert) {
 		ERR_print_errors_fp(stderr);
 		crypto_error_set(error, 1, 0, "failed to decode certificate");
@@ -150,14 +150,14 @@ int crypto_push_cert(crypto_ctx *ctx,
 }
 
 int crypto_verify_chain(crypto_ctx *ctx,
-						const char *ca_file,
-						const char *ca_dir,
-						crypto_error **error)
+			const char *ca_file,
+			const char *ca_dir,
+			crypto_error **error)
 {
-	X509        *x509;
-	X509_STORE  *store = NULL;
+	X509 *x509;
+	X509_STORE *store = NULL;
 	X509_LOOKUP *lookup = NULL;
-	X509_STORE_CTX  *verify_ctx = NULL;
+	X509_STORE_CTX *verify_ctx = NULL;
 	int ret = 1;
 
 	if (!ctx) {
@@ -167,7 +167,7 @@ int crypto_verify_chain(crypto_ctx *ctx,
 
 	x509 = sk_X509_value(ctx->stack, sk_X509_num(ctx->stack) - 1);
 	if (x509 == NULL) {
-		ERR_print_errors_fp (stderr);
+		ERR_print_errors_fp(stderr);
 		crypto_error_set(error, 1, 0, "no certificates in the stack");
 		return 1;
 	}
@@ -179,14 +179,15 @@ int crypto_verify_chain(crypto_ctx *ctx,
 		return 1;
 	}
 	/* load the CA certificates */
-	if (X509_STORE_load_locations (store, ca_file, ca_dir) != 1) {
+	if (X509_STORE_load_locations(store, ca_file, ca_dir) != 1) {
 		crypto_error_set(error, 1, 0, "error loading the CA file (%s) "
-						 "or directory (%s)", ca_file, ca_dir);
+					      "or directory (%s)",
+				 ca_file, ca_dir);
 		goto out;
 	}
-	if (X509_STORE_set_default_paths (store) != 1) {
+	if (X509_STORE_set_default_paths(store) != 1) {
 		crypto_error_set(error, 1, 0, "error loading the system-wide CA"
-						 " certificates");
+					      " certificates");
 		goto out;
 	}
 
@@ -208,12 +209,12 @@ int crypto_verify_chain(crypto_ctx *ctx,
 #endif /* 0 */
 
 	/* create a verification context and initialize it */
-	if (!(verify_ctx = X509_STORE_CTX_new ())) {
+	if (!(verify_ctx = X509_STORE_CTX_new())) {
 		crypto_error_set(error, 1, 0, "error creating X509_STORE_CTX object");
 		goto out;
 	}
 	/* X509_STORE_CTX_init did not return an error condition in prior versions */
-	if (X509_STORE_CTX_init (verify_ctx, store, x509, ctx->stack) != 1) {
+	if (X509_STORE_CTX_init(verify_ctx, store, x509, ctx->stack) != 1) {
 		crypto_error_set(error, 1, 0, "error initializing verification context");
 		goto out;
 	}
@@ -222,7 +223,7 @@ int crypto_verify_chain(crypto_ctx *ctx,
 	if (X509_verify_cert(verify_ctx) != 1) {
 		ERR_print_errors_fp(stderr);
 		crypto_error_set(error, 2, 0, "error verifying the certificate "
-						 "chain");
+					      "chain");
 		goto out;
 	}
 
@@ -239,16 +240,16 @@ out:
 }
 
 unsigned char *crypto_decrypt_signature(crypto_ctx *ctx,
-										const unsigned char *sig_data,
-										size_t sig_len,
-										size_t *out_len,
-										unsigned int padding,
-										crypto_error **error)
+					const unsigned char *sig_data,
+					size_t sig_len,
+					size_t *out_len,
+					unsigned int padding,
+					crypto_error **error)
 {
-	X509        *x509;
-	EVP_PKEY    *pkey = NULL;
+	X509 *x509;
+	EVP_PKEY *pkey = NULL;
 	EVP_PKEY_CTX *pctx = NULL;
-	unsigned char   *hash = NULL;
+	unsigned char *hash = NULL;
 	int ossl_pad;
 
 	*out_len = 0;
@@ -260,21 +261,21 @@ unsigned char *crypto_decrypt_signature(crypto_ctx *ctx,
 
 	x509 = sk_X509_value(ctx->stack, sk_X509_num(ctx->stack) - 1);
 	if (x509 == NULL) {
-		ERR_print_errors_fp (stderr);
+		ERR_print_errors_fp(stderr);
 		crypto_error_set(error, 1, 0, "no certificates in the stack");
 		return NULL;
 	}
 
 	pkey = X509_get_pubkey(x509);
 	if (pkey == NULL) {
-		ERR_print_errors_fp (stderr);
+		ERR_print_errors_fp(stderr);
 		crypto_error_set(error, 1, 0, "error getting certificate public key");
 		return NULL;
 	}
 
 	pctx = EVP_PKEY_CTX_new(pkey, NULL);
 	if (!pctx || EVP_PKEY_verify_recover_init(pctx) <= 0) {
-		ERR_print_errors_fp (stderr);
+		ERR_print_errors_fp(stderr);
 		crypto_error_set(error, 1, 0, "error creating public key context");
 		goto out;
 	}
@@ -299,13 +300,13 @@ unsigned char *crypto_decrypt_signature(crypto_ctx *ctx,
 	}
 
 	if (EVP_PKEY_CTX_set_rsa_padding(pctx, ossl_pad) <= 0) {
-		ERR_print_errors_fp (stderr);
+		ERR_print_errors_fp(stderr);
 		crypto_error_set(error, 1, 0, "failed to set rsa padding");
 		goto out;
 	}
 
 	if (EVP_PKEY_verify_recover(pctx, hash, out_len, sig_data, sig_len) <= 0) {
-		ERR_print_errors_fp (stderr);
+		ERR_print_errors_fp(stderr);
 		crypto_error_set(error, 1, 0, "could not decrypt signature");
 		free(hash);
 		hash = NULL;
@@ -319,4 +320,3 @@ out:
 		EVP_PKEY_CTX_free(pctx);
 	return hash;
 }
-

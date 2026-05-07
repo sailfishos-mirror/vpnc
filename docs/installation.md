@@ -24,13 +24,13 @@ Configuration data gets read from:
 
 Essential configuration information (both with key name for specifying option via command line or config file) it currently needs are:
 
-Input option | File option
------------- | ----------------
-`--gateway`  | `IPSec gateway`
-`--id`       | `IPSec ID`
-`--secret`   | `IPSec secret`
-`--username` | `Xauth username`
-`--password` | `Xauth password`
+| Input option | File option      |
+| ------------ | ---------------- |
+| `--gateway`  | `IPSec gateway`  |
+| `--id`       | `IPSec ID`       |
+| `--secret`   | `IPSec secret`   |
+| `--username` | `Xauth username` |
+| `--password` | `Xauth password` |
 
 A sample configuration file is:
 
@@ -109,11 +109,11 @@ Store this example script, for example in `/etc/vpnc/custom-script`, do a `chmod
 
 ### Additional steps to configure hybrid authentication
 
-Input option         | File option
--------------------- | ------------------
-`--hybrid`           | `Use Hybrid Auth`
-`--ca-file <ca.pem>` | `CA-File <ca.pem>`
-`--ca-dir <ca/dir>`  | `CA-Dir <ca/dir>`
+| Input option         | File option        |
+| -------------------- | ------------------ |
+| `--hybrid`           | `Use Hybrid Auth`  |
+| `--ca-file <ca.pem>` | `CA-File <ca.pem>` |
+| `--ca-dir <ca/dir>`  | `CA-Dir <ca/dir>`  |
 
 Default `CA-Dir` is `/etc/ssl`.
 A link can also be used like in `/etc/ssl/certs/`.

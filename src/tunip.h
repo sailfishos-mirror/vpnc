@@ -24,7 +24,7 @@ struct lifetime {
 
 struct ike_sa {
 	uint32_t spi;
-	uint32_t seq_id;  /* for replay protection */
+	uint32_t seq_id; /* for replay protection */
 	uint32_t seq_backlog;
 
 	uint8_t *key;
@@ -44,7 +44,7 @@ enum natt_active_mode_enum {
 	NATT_ACTIVE_NONE,
 	NATT_ACTIVE_CISCO_UDP, /* isakmp and esp on different ports => never encap */
 	NATT_ACTIVE_DRAFT_OLD, /* as in natt-draft 0 and 1 */
-	NATT_ACTIVE_RFC        /* draft 2 and RFC3947 / RFC3948 */
+	NATT_ACTIVE_RFC /* draft 2 and RFC3947 / RFC3948 */
 };
 
 struct sa_block {

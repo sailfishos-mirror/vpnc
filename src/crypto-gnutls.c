@@ -42,7 +42,7 @@ crypto_ctx *crypto_ctx_new(crypto_error **error)
 	if (!ctx->stack) {
 		crypto_ctx_free(ctx);
 		crypto_error_set(error, 1, ENOMEM,
-						 "not enough memory for crypto certificate stack");
+				 "not enough memory for crypto certificate stack");
 		ctx = NULL;
 	}
 
@@ -63,8 +63,8 @@ void crypto_ctx_free(crypto_ctx *ctx)
 }
 
 unsigned char *crypto_read_cert(const char *path,
-								size_t *out_len,
-								crypto_error **error)
+				size_t *out_len,
+				crypto_error **error)
 {
 	gnutls_x509_crt_t cert;
 	unsigned char *data = NULL;
@@ -76,7 +76,7 @@ unsigned char *crypto_read_cert(const char *path,
 	if (!dt.data)
 		return NULL;
 
-	dt.size = (unsigned int) fsize;
+	dt.size = (unsigned int)fsize;
 	if (gnutls_x509_crt_init(&cert) != GNUTLS_E_SUCCESS) {
 		crypto_error_set(error, 1, ENOMEM, "not enough memory for certificate");
 		goto out;
@@ -107,9 +107,9 @@ out:
 }
 
 int crypto_push_cert(crypto_ctx *ctx,
-					 const unsigned char *data,
-					 size_t len,
-					 crypto_error **error)
+		     const unsigned char *data,
+		     size_t len,
+		     crypto_error **error)
 {
 	gnutls_x509_crt_t cert;
 	gnutls_datum_t dt;
@@ -125,13 +125,13 @@ int crypto_push_cert(crypto_ctx *ctx,
 		return 1;
 	}
 
-	gnutls_x509_crt_init (&cert);
+	gnutls_x509_crt_init(&cert);
 
-	dt.data = (unsigned char *) data;
+	dt.data = (unsigned char *)data;
 	dt.size = len;
-	err = gnutls_x509_crt_import (cert, &dt, GNUTLS_X509_FMT_DER);
+	err = gnutls_x509_crt_import(cert, &dt, GNUTLS_X509_FMT_DER);
 	if (err != GNUTLS_E_SUCCESS) {
-		gnutls_x509_crt_deinit (cert);
+		gnutls_x509_crt_deinit(cert);
 		crypto_error_set(error, 1, 0, "failed to decode certificate");
 		return 1;
 	}
@@ -142,11 +142,11 @@ int crypto_push_cert(crypto_ctx *ctx,
 }
 
 static int verify_issuer(gnutls_x509_crt_t crt,
-						 gnutls_x509_crt_t issuer,
-						 crypto_error **error)
+			 gnutls_x509_crt_t issuer,
+			 crypto_error **error)
 {
 	unsigned int output;
-	time_t now = time (0);
+	time_t now = time(0);
 
 	if (gnutls_x509_crt_verify(crt, &issuer, 1, 0, &output) < 0) {
 		crypto_error_set(error, 1, 0, "failed to verify against issuer");
@@ -178,16 +178,16 @@ static int verify_issuer(gnutls_x509_crt_t crt,
 }
 
 static int verify_last(gnutls_x509_crt_t crt,
-					   gnutls_x509_crt_t *ca_list,
-					   size_t ca_list_size,
-					   crypto_error **error)
+		       gnutls_x509_crt_t *ca_list,
+		       size_t ca_list_size,
+		       crypto_error **error)
 {
 	unsigned int output;
-	time_t now = time (0);
+	time_t now = time(0);
 
-	if (gnutls_x509_crt_verify (crt, ca_list, ca_list_size,
-								GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
-								&output) < 0) {
+	if (gnutls_x509_crt_verify(crt, ca_list, ca_list_size,
+				   GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
+				   &output) < 0) {
 		crypto_error_set(error, 1, 0, "failed to verify against CA list");
 		return 1;
 	}
@@ -224,16 +224,16 @@ static gnutls_x509_crt_t *load_one_ca_file(const char *path, crypto_error **erro
 	if (!dt.data)
 		return NULL;
 
-	dt.size = (unsigned int) fsize;
-	if (gnutls_x509_crt_init (&cert) != GNUTLS_E_SUCCESS) {
+	dt.size = (unsigned int)fsize;
+	if (gnutls_x509_crt_init(&cert) != GNUTLS_E_SUCCESS) {
 		gnutls_free(dt.data);
 		crypto_error_set(error, 1, ENOMEM, "not enough memory for certificate");
 		goto out;
 	}
 
-	err = gnutls_x509_crt_import (cert, &dt, GNUTLS_X509_FMT_PEM);
+	err = gnutls_x509_crt_import(cert, &dt, GNUTLS_X509_FMT_PEM);
 	if (err != GNUTLS_E_SUCCESS)
-		err = gnutls_x509_crt_import (cert, &dt, GNUTLS_X509_FMT_DER);
+		err = gnutls_x509_crt_import(cert, &dt, GNUTLS_X509_FMT_DER);
 	gnutls_free(dt.data);
 	if (err != GNUTLS_E_SUCCESS) {
 		crypto_error_set(error, 1, 0, "certificate (%s) format unknown", path);
@@ -248,16 +248,16 @@ static gnutls_x509_crt_t *load_one_ca_file(const char *path, crypto_error **erro
 		list[0] = cert;
 
 out:
-	gnutls_x509_crt_deinit (cert);
+	gnutls_x509_crt_deinit(cert);
 	return list;
 }
 
 static gnutls_x509_crt_t *load_ca_list_file(const char *path,
-											size_t *out_list_size,
-											crypto_error **error)
+					    size_t *out_list_size,
+					    crypto_error **error)
 {
 	gnutls_x509_crt_t *list;
-	gnutls_datum_t dt = { NULL, 0 };
+	gnutls_datum_t dt = {NULL, 0};
 	size_t fsize = 0;
 	int err;
 	unsigned int num = 200;
@@ -266,7 +266,7 @@ static gnutls_x509_crt_t *load_ca_list_file(const char *path,
 	if (!dt.data)
 		return NULL;
 
-	dt.size = (unsigned int) fsize;
+	dt.size = (unsigned int)fsize;
 	list = gnutls_malloc(sizeof(gnutls_x509_crt_t) * num);
 	if (!list) {
 		crypto_error_set(error, 1, ENOMEM, "not enough memory for CA list");
@@ -282,7 +282,7 @@ static gnutls_x509_crt_t *load_ca_list_file(const char *path,
 			goto out;
 		num = 1;
 	} else
-		num = err;  /* gnutls_x509_crt_list_import() returns # read */
+		num = err; /* gnutls_x509_crt_list_import() returns # read */
 
 	if (err < 0) {
 		crypto_error_set(error, 1, 0, "importing CA list (%d)", err);
@@ -297,9 +297,9 @@ out:
 }
 
 int crypto_verify_chain(crypto_ctx *ctx,
-						const char *ca_file,
-						const char *ca_dir,
-						crypto_error **error)
+			const char *ca_file,
+			const char *ca_dir,
+			crypto_error **error)
 {
 	int err, i, ret = 1, start = 0;
 	gnutls_x509_crt_t *ca_list = NULL;
@@ -340,17 +340,17 @@ int crypto_verify_chain(crypto_ctx *ctx,
 
 out:
 	if (ca_list) {
-		for (i = 0; i < (int) ca_list_size; i++)
+		for (i = 0; i < (int)ca_list_size; i++)
 			gnutls_x509_crt_deinit(ca_list[i]);
 		gnutls_free(ca_list);
 	}
 	return ret;
 }
 
-static unsigned char *check_pkcs1_padding(unsigned char* from,
-										  size_t from_len,
-										  size_t *out_len,
-										  crypto_error **error)
+static unsigned char *check_pkcs1_padding(unsigned char *from,
+					  size_t from_len,
+					  size_t *out_len,
+					  crypto_error **error)
 {
 	int i = 0;
 	unsigned char *rec_hash = NULL;
@@ -390,16 +390,15 @@ out:
 	return rec_hash;
 }
 
-
 unsigned char *crypto_decrypt_signature(crypto_ctx *ctx,
-										const unsigned char *sig_data,
-										size_t sig_len,
-										size_t *out_len,
-										unsigned int padding,
-										crypto_error **error)
+					const unsigned char *sig_data,
+					size_t sig_len,
+					size_t *out_len,
+					unsigned int padding,
+					crypto_error **error)
 {
 	unsigned char *buf = NULL, *rec_hash = NULL;
-	gnutls_datum_t n = { NULL, 0 }, e = { NULL, 0 };
+	gnutls_datum_t n = {NULL, 0}, e = {NULL, 0};
 	int err, algo;
 	gcry_sexp_t key = NULL, sig = NULL, decrypted = NULL, child = NULL;
 	gcry_mpi_t n_mpi = NULL, e_mpi = NULL, sig_mpi = NULL, dec_mpi = NULL;
@@ -489,7 +488,7 @@ unsigned char *crypto_decrypt_signature(crypto_ctx *ctx,
 		rec_hash = buf;
 		hash_len = buf_len;
 		buf = NULL;
-		*out_len = (int) hash_len;
+		*out_len = (int)hash_len;
 		break;
 	case CRYPTO_PAD_PKCS1:
 		rec_hash = check_pkcs1_padding(buf, buf_len, &hash_len, error);
@@ -497,7 +496,7 @@ unsigned char *crypto_decrypt_signature(crypto_ctx *ctx,
 			crypto_error_set(error, 1, 0, "could not get extract decrypted padded signature");
 			goto out;
 		}
-		*out_len = (int) hash_len;
+		*out_len = (int)hash_len;
 		break;
 	default:
 		crypto_error_set(error, 1, 0, "unknown padding mechanism %d", padding);
@@ -528,4 +527,3 @@ out:
 
 	return rec_hash;
 }
-

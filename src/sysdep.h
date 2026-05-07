@@ -39,14 +39,14 @@ int tun_get_hwaddr(int fd, char *dev, uint8_t *hwaddr);
 /***************************************************************************/
 #if defined(__GLIBC__) || defined(__UCLIBC__)
 #include <error.h>
-#define HAVE_ERROR     1
+#define HAVE_ERROR 1
 #endif
 
 #if defined(__linux__) || defined(__GLIBC__)
 #define HAVE_VASPRINTF 1
-#define HAVE_ASPRINTF  1
-#define HAVE_UNSETENV  1
-#define HAVE_SETENV    1
+#define HAVE_ASPRINTF 1
+#define HAVE_UNSETENV 1
+#define HAVE_SETENV 1
 #endif
 
 /***************************************************************************/
@@ -54,9 +54,9 @@ int tun_get_hwaddr(int fd, char *dev, uint8_t *hwaddr);
 #define HAVE_SA_LEN 1
 
 #define HAVE_VASPRINTF 1
-#define HAVE_ASPRINTF  1
-#define HAVE_UNSETENV  1
-#define HAVE_SETENV    1
+#define HAVE_ASPRINTF 1
+#define HAVE_UNSETENV 1
+#define HAVE_SETENV 1
 #endif
 
 /***************************************************************************/
@@ -66,9 +66,9 @@ int tun_get_hwaddr(int fd, char *dev, uint8_t *hwaddr);
 #define NEW_TUN 1
 
 #define HAVE_VASPRINTF 1
-#define HAVE_ASPRINTF  1
-#define HAVE_UNSETENV  1
-#define HAVE_SETENV    1
+#define HAVE_ASPRINTF 1
+#define HAVE_UNSETENV 1
+#define HAVE_SETENV 1
 #endif
 
 /***************************************************************************/
@@ -81,9 +81,9 @@ int tun_get_hwaddr(int fd, char *dev, uint8_t *hwaddr);
 #define HAVE_SA_LEN 1
 
 #define HAVE_VASPRINTF 1
-#define HAVE_ASPRINTF  1
-#define HAVE_UNSETENV  1
-#define HAVE_SETENV    1
+#define HAVE_ASPRINTF 1
+#define HAVE_UNSETENV 1
+#define HAVE_SETENV 1
 #endif
 
 /***************************************************************************/
@@ -91,9 +91,9 @@ int tun_get_hwaddr(int fd, char *dev, uint8_t *hwaddr);
 #define HAVE_SA_LEN 1
 
 #define HAVE_VASPRINTF 1
-#define HAVE_ASPRINTF  1
-#define HAVE_UNSETENV  1
-#define HAVE_SETENV    1
+#define HAVE_ASPRINTF 1
+#define HAVE_UNSETENV 1
+#define HAVE_SETENV 1
 #endif
 
 /***************************************************************************/
@@ -102,10 +102,10 @@ int tun_get_hwaddr(int fd, char *dev, uint8_t *hwaddr);
 #define NEED_IPLEN_FIX 1
 
 #define HAVE_VASPRINTF 1
-#define HAVE_ASPRINTF  1
-#define HAVE_UNSETENV  1
-#define HAVE_SETENV    1
-#if (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__-0) >= 1070
+#define HAVE_ASPRINTF 1
+#define HAVE_UNSETENV 1
+#define HAVE_SETENV 1
+#if (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ - 0) >= 1070
 #endif
 #endif
 
@@ -122,8 +122,8 @@ int tun_get_hwaddr(int fd, char *dev, uint8_t *hwaddr);
 const char *inet_ntop(int af, const void *src, char *dst, size_t cnt);
 #endif
 /***************************************************************************/
-#if defined (__SKYOS__)
-#define HAVE_UNSETENV  1
+#if defined(__SKYOS__)
+#define HAVE_UNSETENV 1
 
 #ifndef IPPROTO_ENCAP
 #define IPPROTO_ENCAP 4
@@ -134,11 +134,11 @@ const char *inet_ntop(int af, const void *src, char *dst, size_t cnt);
 #endif
 #endif
 /***************************************************************************/
-#if defined (__CYGWIN__)
+#if defined(__CYGWIN__)
 #define HAVE_VASPRINTF 1
-#define HAVE_ASPRINTF  1
-#define HAVE_UNSETENV  1
-#define HAVE_SETENV    1
+#define HAVE_ASPRINTF 1
+#define HAVE_UNSETENV 1
+#define HAVE_SETENV 1
 
 #ifndef IPPROTO_ESP
 #define IPPROTO_ESP 50
@@ -162,47 +162,45 @@ const char *inet_ntop(int af, const void *src, char *dst, size_t cnt);
 #define ETH_ALEN 6
 
 /* Ethernet header */
-struct ether_header
-{
+struct ether_header {
 	unsigned char ether_dhost[ETH_ALEN]; /* destination eth addr */
 	unsigned char ether_shost[ETH_ALEN]; /* source ether addr    */
-	unsigned short ether_type;           /* packet type ID field */
-} __attribute__ ((__packed__));
+	unsigned short ether_type; /* packet type ID field */
+} __attribute__((__packed__));
 
-#define ETHERTYPE_IP  0x0800 /* IP  */
+#define ETHERTYPE_IP 0x0800 /* IP  */
 #define ETHERTYPE_ARP 0x0806 /* ARP */
 
 /* Common ARP header */
 struct arphdr {
 	unsigned short ar_hrd; /* format of hardware address   */
 	unsigned short ar_pro; /* format of protocol address   */
-	unsigned char ar_hln;  /* length of hardware address   */
-	unsigned char ar_pln;  /* length of protocol address   */
-	unsigned short ar_op;  /* ARP opcode (command)         */
+	unsigned char ar_hln; /* length of hardware address   */
+	unsigned char ar_pln; /* length of protocol address   */
+	unsigned short ar_op; /* ARP opcode (command)         */
 };
 
 /* Ethernet ARP header */
 struct ether_arp {
-	struct arphdr ea_hdr;            /* fixed-size header */
+	struct arphdr ea_hdr; /* fixed-size header */
 	unsigned char arp_sha[ETH_ALEN]; /* sender hardware address */
-	unsigned char arp_spa[4];        /* sender protocol address */
+	unsigned char arp_spa[4]; /* sender protocol address */
 	unsigned char arp_tha[ETH_ALEN]; /* target hardware address */
-	unsigned char arp_tpa[4];        /* target protocol address */
+	unsigned char arp_tpa[4]; /* target protocol address */
 };
 #define arp_hrd ea_hdr.ar_hrd
 #define arp_pro ea_hdr.ar_pro
 #define arp_hln ea_hdr.ar_hln
 #define arp_pln ea_hdr.ar_pln
-#define arp_op  ea_hdr.ar_op
+#define arp_op ea_hdr.ar_op
 
 #define ARPHRD_ETHER 1 /* Ethernet */
 
 #define ARPOP_REQUEST 1 /* ARP request */
-#define ARPOP_REPLY   2 /* ARP reply   */
+#define ARPOP_REPLY 2 /* ARP reply   */
 
 #endif
 /***************************************************************************/
-
 
 #ifndef IPDEFTTL
 #define IPDEFTTL 64 /* default ttl, from RFC 1340 */
@@ -236,6 +234,5 @@ extern int setenv(const char *name, const char *value, int overwrite);
 #ifndef HAVE_UNSETENV
 extern int unsetenv(const char *name);
 #endif
-
 
 #endif /* VPNC_SYSDEP_H */

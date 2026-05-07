@@ -22,7 +22,7 @@ static unsigned char *read_binfile(const char *filename, size_t *len)
 	struct stat s;
 	unsigned char *b;
 
-	if (filename == NULL || len ==NULL)
+	if (filename == NULL || len == NULL)
 		return NULL;
 
 	fd = open(filename, O_RDONLY);
@@ -126,7 +126,8 @@ int main(int argc, char *argv[])
 
 	if (size != dec_len) {
 		fprintf(stderr, "Error decrypting signature: unexpected "
-				"decrypted size %zd (expected %zu)\n", size, dec_len);
+				"decrypted size %zd (expected %zu)\n",
+			size, dec_len);
 		free(dec_data);
 		free(sig_data);
 		free(data);
@@ -150,4 +151,3 @@ int main(int argc, char *argv[])
 	crypto_ctx_free(cctx);
 	return 0;
 }
-

@@ -7,13 +7,12 @@ According to him, the differences are:
 
 - The group name and password are pre-transformed:
 
-  ```
+  ```text
   key_id = SHA1(group_name)
   shared_key = HMAC_SHA1(group_name, SHA1(group_password))
   ```
 
 - The XAUTH implementation follows `draft-ietf-ipsec-isakmp-xauth-02.txt` (whereas CISCO uses a later version). Specifically:
-
   - the encoding of the proposal is not defined in that spec, and Nortel does it differently;
   - the `XAUTH` attributes have different numerical values (which overlap with `Mode-Config`);
   - success/failure are encoded as `Mode-Config` message types 5/6 (or sometimes as an `ISAKMP` notify?) rather than in an attribute;
@@ -27,7 +26,7 @@ Thus the changes are fairly intrusive - phase 1 is common but `XAUTH`/`Mode-Conf
 
 According to Zingo Andersen, `NORTELVPN_XAUTHTYPE_AS_REQUEST` has to be set and this patch applied:
 
-```
+```c
 #ifdef NORTELVPN_XAUTHTYPE_AS_REQUEST
     if (ap->af != isakmp_attr_16 || !(ap->u.attr_16 == 0 || ap->u.attr_16 == 5))
         reject = ISAKMP_N_ATTRIBUTES_NOT_SUPPORTED;

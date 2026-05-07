@@ -23,9 +23,9 @@ int main(int argc, char *argv[])
 
 	if (argc == 1 || *argv[1] == '-') {
 		fprintf(stderr,
-				"\nUsage: %s DEADBEEF...012345678 424242...7261\n"
-				"    Print decoded result to stdout\n\n",
-				argv[0]);
+			"\nUsage: %s DEADBEEF...012345678 424242...7261\n"
+			"    Print decoded result to stdout\n\n",
+			argv[0]);
 		exit(1);
 	}
 	/* Hack for use in pcf2vpnc */

@@ -10,34 +10,34 @@
 #define VPNC_ISAKMP_H
 
 /* Flag bits for header.  */
-#define ISAKMP_FLAG_E   0x1
-#define ISAKMP_FLAG_C   0x2
-#define ISAKMP_FLAG_A   0x4
+#define ISAKMP_FLAG_E 0x1
+#define ISAKMP_FLAG_C 0x2
+#define ISAKMP_FLAG_A 0x4
 
 /* Payload types */
 enum isakmp_payload_enum {
-	ISAKMP_PAYLOAD_NONE = 0,    /* RFC 2408 */
-	ISAKMP_PAYLOAD_SA,      /* RFC 2408, Security Association	*/
-	ISAKMP_PAYLOAD_P,       /* RFC 2408, Proposal			*/
-	ISAKMP_PAYLOAD_T,       /* RFC 2408, Transform			*/
-	ISAKMP_PAYLOAD_KE,      /* RFC 2408, Key Exchange		*/
-	ISAKMP_PAYLOAD_ID,      /* RFC 2408, Identification		*/
-	ISAKMP_PAYLOAD_CERT,        /* RFC 2408, Certificate		*/
-	ISAKMP_PAYLOAD_CR,      /* RFC 2408, Certificate Request	*/
-	ISAKMP_PAYLOAD_HASH,        /* RFC 2408, Hash			*/
-	ISAKMP_PAYLOAD_SIG,     /* RFC 2408, Signature			*/
-	ISAKMP_PAYLOAD_NONCE,       /* RFC 2408, Nonce			*/
-	ISAKMP_PAYLOAD_N,       /* RFC 2408, Notification		*/
-	ISAKMP_PAYLOAD_D,       /* RFC 2408, Delete			*/
-	ISAKMP_PAYLOAD_VID,     /* RFC 2408, Vendor ID			*/
+	ISAKMP_PAYLOAD_NONE = 0, /* RFC 2408 */
+	ISAKMP_PAYLOAD_SA, /* RFC 2408, Security Association	*/
+	ISAKMP_PAYLOAD_P, /* RFC 2408, Proposal			*/
+	ISAKMP_PAYLOAD_T, /* RFC 2408, Transform			*/
+	ISAKMP_PAYLOAD_KE, /* RFC 2408, Key Exchange		*/
+	ISAKMP_PAYLOAD_ID, /* RFC 2408, Identification		*/
+	ISAKMP_PAYLOAD_CERT, /* RFC 2408, Certificate		*/
+	ISAKMP_PAYLOAD_CR, /* RFC 2408, Certificate Request	*/
+	ISAKMP_PAYLOAD_HASH, /* RFC 2408, Hash			*/
+	ISAKMP_PAYLOAD_SIG, /* RFC 2408, Signature			*/
+	ISAKMP_PAYLOAD_NONCE, /* RFC 2408, Nonce			*/
+	ISAKMP_PAYLOAD_N, /* RFC 2408, Notification		*/
+	ISAKMP_PAYLOAD_D, /* RFC 2408, Delete			*/
+	ISAKMP_PAYLOAD_VID, /* RFC 2408, Vendor ID			*/
 	ISAKMP_PAYLOAD_MODECFG_ATTR,
-	ISAKMP_PAYLOAD_SAK,     /* RFC 3547, SA KEK			*/
-	ISAKMP_PAYLOAD_SAT,     /* RFC 3547, SA TEK			*/
-	ISAKMP_PAYLOAD_KD,      /* RFC 3547, Key Download		*/
-	ISAKMP_PAYLOAD_SEQNO,       /* RFC 3547, Sequence number		*/
-	ISAKMP_PAYLOAD_POP,     /* RFC 3547, Proof of Possession	*/
-	ISAKMP_PAYLOAD_NAT_D,       /* RFC 3947, NAT Discovery		*/
-	ISAKMP_PAYLOAD_NAT_OA,      /* RFC 3947, NAT Original Address	*/
+	ISAKMP_PAYLOAD_SAK, /* RFC 3547, SA KEK			*/
+	ISAKMP_PAYLOAD_SAT, /* RFC 3547, SA TEK			*/
+	ISAKMP_PAYLOAD_KD, /* RFC 3547, Key Download		*/
+	ISAKMP_PAYLOAD_SEQNO, /* RFC 3547, Sequence number		*/
+	ISAKMP_PAYLOAD_POP, /* RFC 3547, Proof of Possession	*/
+	ISAKMP_PAYLOAD_NAT_D, /* RFC 3947, NAT Discovery		*/
+	ISAKMP_PAYLOAD_NAT_OA, /* RFC 3947, NAT Original Address	*/
 	ISAKMP_PAYLOAD_NAT_D_OLD = 0x82,
 	ISAKMP_PAYLOAD_FRAG = 0x84
 };
@@ -252,8 +252,8 @@ enum ike_life_enum {
 /* IPSEC situation masks.  */
 enum isakmp_ipsec_sit_enum {
 	ISAKMP_IPSEC_SIT_IDENTITY_ONLY = 0x1,
-	ISAKMP_IPSEC_SIT_SECRECY       = 0x2,
-	ISAKMP_IPSEC_SIT_INTEGRITY     = 0x4
+	ISAKMP_IPSEC_SIT_SECRECY = 0x2,
+	ISAKMP_IPSEC_SIT_INTEGRITY = 0x4
 };
 
 /* IPSEC Identification types.  */
@@ -371,14 +371,14 @@ enum ipsec_auth_enum {
 };
 
 /* Other numbers.  */
-#define ISAKMP_COOKIE_LENGTH        8
-#define ISAKMP_VERSION          0x10
+#define ISAKMP_COOKIE_LENGTH 8
+#define ISAKMP_VERSION 0x10
 /* offsets */
-#define ISAKMP_EXCHANGE_TYPE_O      18
-#define ISAKMP_I_COOKIE_O       0
-#define ISAKMP_R_COOKIE_O       8
-#define ISAKMP_MESSAGE_ID_O     20
-#define ISAKMP_PAYLOAD_O        28
+#define ISAKMP_EXCHANGE_TYPE_O 18
+#define ISAKMP_I_COOKIE_O 0
+#define ISAKMP_R_COOKIE_O 8
+#define ISAKMP_MESSAGE_ID_O 20
+#define ISAKMP_PAYLOAD_O 28
 
 /* defined in vpnc.c */
 extern const unsigned char VID_XAUTH[];
