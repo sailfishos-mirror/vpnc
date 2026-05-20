@@ -5,6 +5,10 @@ on: # yamllint disable-line rule:truthy
   push: null
   pull_request: null
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   actions: read
   attestations: none
@@ -42,6 +46,9 @@ jobs:
           VALIDATE_CPP: false
           # pcf2vpnc is vendored upstream perl
           FILTER_REGEX_EXCLUDE: .*src/pcf2vpnc$
+          SAVE_SUPER_LINTER_OUTPUT: false
+          MULTI_STATUS: false
+          LOG_LEVEL: WARN
   test:
     needs: [super-linter]
     if: success()
