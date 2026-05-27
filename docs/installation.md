@@ -12,7 +12,10 @@ sudo make install
 Few libraries are required to let VPNC work properly:
 
 - `libgcrypt` (version: `1.1.90+`)
-- `libopenssl` (optional, needed to provide hybrid support)
+- `libgnutls` — default crypto backend used to build VPNC.
+- `libopenssl` — alternative crypto backend, opt-in by setting `OPENSSL_GPL_VIOLATION=yes` when invoking `make`. Linking against OpenSSL is technically GPL-incompatible, hence the explicit flag.
+
+On Debian/Ubuntu the default build pulls `libgcrypt20-dev`, `libgnutls28-dev` and `pkg-config`; on Fedora the equivalents are `libgcrypt-devel` and `gnutls-devel`. Hybrid authentication works under either backend.
 
 Configuration data gets read from:
 
@@ -46,6 +49,8 @@ This lets you put any kind of weird character (except CR, LF and NUL) in your st
 
 It may be easier to use the `--print-config` option to generate the config file, and then delete any lines (like a password) that you want to be prompted for.
 
+For the full list of supported CLI flags and config-file keys (including DPD, NAT-T tuning, IPv6 transport options and a number of less common knobs), run `vpnc --long-help`.
+
 If you don't know the Group ID and Secret string, ask your administrator.
 If they decline and refer to the configuration files provided for the vpnclient program, tell them that the contents of that files are (though scrambled) not really protected.
 If you have a working configuration file (`.pcf` file) for the Cisco client then you can use the `pcf2vpnc` utility instead, which will extract most/all of the required information and convert it into a vpnc configuration file.
@@ -57,7 +62,7 @@ You need to do this yourself, or use `--script script.sh`/`Script script.sh` (th
 The default script is `/etc/vpnc/vpnc-script` which sets a default route to the remote network, or if the Concentrator provided split-network settings, these are used to setup routes.
 
 This option is passed to `system()`, so you can use any shell-specials you like.
-This script gets called tree times:
+This script gets called three times:
 
 1. `$reason == pre-init`: this is before VPNC opens the tun device, so you can do what is necessary to ensure that it is available. Note that none of the variables mentioned below is available.
 2. `$reason == connect`: this is what used to be "Config Script". The connection is established, but vpnc will not begin forwarding packets until the script finishes.
@@ -109,13 +114,15 @@ Store this example script, for example in `/etc/vpnc/custom-script`, do a `chmod
 
 ### Additional steps to configure hybrid authentication
 
-| Input option         | File option        |
-| -------------------- | ------------------ |
-| `--hybrid`           | `Use Hybrid Auth`  |
-| `--ca-file <ca.pem>` | `CA-File <ca.pem>` |
-| `--ca-dir <ca/dir>`  | `CA-Dir <ca/dir>`  |
+| Input option         | File option           |
+| -------------------- | --------------------- |
+| `--auth-mode hybrid` | `IKE Authmode hybrid` |
+| `--ca-file <ca.pem>` | `CA-File <ca.pem>`    |
+| `--ca-dir <ca/dir>`  | `CA-Dir <ca/dir>`     |
 
-Default `CA-Dir` is `/etc/ssl`.
+Other accepted values for `--auth-mode` / `IKE Authmode` are `psk` (default) and `cert`.
+
+Default `CA-Dir` is `/etc/ssl/certs`.
 A link can also be used like in `/etc/ssl/certs/`.
 
 As the trusted certificate is referenced by the hash of the subject name, the directory has to contain the certificate named like that hash value.
